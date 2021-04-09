@@ -7,10 +7,8 @@ Galène's server side is implemented in Go, and uses the Pion implementation of 
 ## How to use this image
 
 ```bash
-docker run -it --network host deburau/galene:latest -turn $(curl -4 ifconfig.co):1194
+docker run -it -p 8443:8443 deburau/galene:latest -turn ""
 ```
-
-You can replace $(curl -4 ifconfig.co) with your server's ip address.
 
 * Open a compatible browser to the [Galène frontend](http://localhost:8443)
 
@@ -18,3 +16,13 @@ You can replace $(curl -4 ifconfig.co) with your server's ip address.
 
 > Please note that you may need a slightly more extended setup when you
 > want to have conferences between multiple users.
+
+## Using the built in turn server
+
+If you want to use the built in turn server, you have to run the image in host mode:
+
+```bash
+docker run -it --network host deburau/galene:latest -turn $(curl -4 ifconfig.co):1194
+```
+
+You can replace $(curl -4 ifconfig.co) with your server's ip address.
