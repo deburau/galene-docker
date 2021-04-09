@@ -75,3 +75,45 @@ cat > data/ice-servers.json <<EOF
 EOF
 ```
 
+## docker-compose Example
+
+I am using it with my own turn server and traefik as reverse proxy.
+
+```yaml
+version: '3'
+
+services:
+  galene:
+    image: galene:latest
+    container_name: galene
+    restart: always
+    volumes:
+      - ./data:/data
+      - ./groups:/groups
+    ports:
+      - 1194:1194/tcp
+      - 1194:1194/udp
+    networks:
+      traefik:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.galene.rule=Host(`galene.example.com`)"
+      - "traefik.http.routers.galene.entrypoints=websecure"
+      - "traefik.http.routers.galene.tls=true"
+      - "traefik.http.routers.galene.tls.domains[0].main=galene.galene.example.com"
+      - "traefik.http.routers.galene.service=galene"
+      - "traefik.http.services.galene.loadbalancer.server.port=80"
+      - "traefik.http.services.galene.loadbalancer.server.scheme=http"
+      - "traefik.http.services.galene.loadbalancer.passhostheader=true"
+    command:
+      - -http
+      - :80
+      - -insecure
+      - -turn
+      - ""
+
+networks:
+  traefik:
+    external: true
+```
