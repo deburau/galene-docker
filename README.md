@@ -26,3 +26,52 @@ docker run -it --network host deburau/galene:latest -turn $(curl -4 ifconfig.co)
 ```
 
 You can replace $(curl -4 ifconfig.co) with your server's ip address.
+
+## Configure data and groups
+
+To configure groups, passwords, ice servers etc. you can use volume mounts.
+
+```bash
+mkdir data groups
+docker run -it -p 8443:8443 -v $PWD/data:/data -v $PWD/groups:/groups deburau/galene:latest -turn ""
+```
+
+### Setting the admin password
+
+```bash
+echo "admin:topsecret" > data/passwd
+```
+
+
+### Creating a group
+
+```bash
+cat > groups/mygroup.json <<EOF
+{
+    "codecs": ["vp8", "vp9", "opus"],
+    "autolock": false,
+    "op": [{"username": "myname", "password": "mypassword"}],
+    "presenter": [{"password": "grouppassword"}]
+}
+EOF
+```
+
+### Configuring your own turn server
+
+If you are running your own turn server, eg. coTURN, configure it like
+
+```bash
+cat > data/ice-servers.json <<EOF
+[
+    {
+        "Urls": [
+            "turn:turn.example.com:5349?transport=tcp",
+            "turn:turn.example.com:5349?transport=udp"
+        ],
+        "credential": "my-static-auth-secret",
+        "credentialType": "hmac-sha1"
+    }
+]
+EOF
+```
+
