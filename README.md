@@ -84,7 +84,7 @@ version: '3'
 
 services:
   galene:
-    image: galene:latest
+    image: deburau/galene:latest
     container_name: galene
     restart: always
     volumes:
