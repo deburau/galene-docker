@@ -10,6 +10,10 @@ Source code for this image is available on [GitHub](https://github.com/deburau/g
 
 The image itself resides on [Docker Hub](https://hub.docker.com/r/deburau/galene).
 
+## About this image
+
+This image is based on the [galene44 image](https://github.com/garage44/galene). But this image is self contained (you do need to clone the git repo) and it is small, the size is only 15.6MB.
+
 ## How to use this image
 
 ```bash
@@ -123,3 +127,5 @@ networks:
   traefik:
     external: true
 ```
+
+More examples and complete docs can be found in the [garage44 wiki](https://github.com/garage44/galene/wiki) an the official [site](https://github.com/garage44/galene/wiki).
