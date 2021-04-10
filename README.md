@@ -4,6 +4,12 @@ Galène is a videoconferencing server that is easy to deploy (just copy a few fi
 
 Galène's server side is implemented in Go, and uses the Pion implementation of WebRTC. The server has been tested on Linux/amd64 and Linux/arm64, and should in principle be portable to other systems (including Mac OS X and Windows). The client is implemented in Javascript, and works on recent versions of all major web browsers, both on desktop and mobile.
 
+You can find out more on the [Galène website](https://galene.org/).
+
+Source code for this image is available on [GitHub](https://github.com/deburau/galene).
+
+The image itself resides on [Docker Hub](https://hub.docker.com/r/deburau/galene).
+
 ## How to use this image
 
 ```bash
