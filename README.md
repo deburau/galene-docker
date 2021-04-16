@@ -85,7 +85,7 @@ cat > data/ice-servers.json <<EOF
 EOF
 ```
 
-## docker-compose Example
+## Complete docker-compose Example
 
 I am using it with my own turn server and traefik as reverse proxy.
 
