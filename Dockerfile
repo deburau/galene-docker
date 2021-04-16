@@ -1,5 +1,5 @@
 ARG DIR=/go/src/galene
-ARG VERSION=0.3.2
+ARG VERSION=0.3.3
 
 FROM golang:latest AS builder
 ARG DIR
