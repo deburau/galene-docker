@@ -17,6 +17,7 @@ ARG VERSION
 ARG NAME=$DOCKER_REPO
 ARG VCS_REF=$SOURCE_COMMIT
 
+LABEL maintainer="galene@flexoft.net"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.name="$NAME"
 LABEL org.label-schema.description="Docker image for the Galène videoconference server"
