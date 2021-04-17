@@ -6,7 +6,7 @@ Galène's server side is implemented in Go, and uses the Pion implementation of 
 
 You can find out more on the [Galène website](https://galene.org/).
 
-Source code for this image is available on [GitHub](https://github.com/deburau/galene).
+Source code for this image is available on [GitHub](https://github.com/deburau/galene-docker).
 
 The image itself resides on [Docker Hub](https://hub.docker.com/r/deburau/galene).
 
