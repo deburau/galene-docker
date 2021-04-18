@@ -3,7 +3,7 @@ set -e
 
 # first arg not empty and is not `-f` or `--some-option`
 if [ -n "$1" -a "${1#-}" = "$1" ]; then
-    exec "$@"
+  exec "$@"
 fi
 
 export GALENE_PATH="/opt/galene"

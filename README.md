@@ -14,10 +14,28 @@ The image itself resides on [Docker Hub](https://hub.docker.com/r/deburau/galene
 
 This image is based on the [galene44 image](https://github.com/garage44/galene). But this image is self contained (you do need to clone the git repo) and it is small, the size is only 15.6MB.
 
+Configuration is possible through environment variables.
+
 ## How to use this image
 
 ```bash
-docker run -it -p 8443:8443 deburau/galene:latest -turn ""
+docker run -it -p 8443:8443 -e GALENE_TURN= deburau/galene:latest
+```
+
+Or using docker-compose
+
+```yaml
+version: '3'
+
+services:
+  galene:
+    image: deburau/galene:latest
+    container_name: galene
+    restart: always
+    ports:
+      - 8443:8443
+    environment:
+      - GALENE_TURN=
 ```
 
 * Open a compatible browser to the [Galène frontend](http://localhost:8443)
@@ -32,10 +50,25 @@ docker run -it -p 8443:8443 deburau/galene:latest -turn ""
 If you want to use the built in turn server, you have to run the image in host mode:
 
 ```bash
-docker run -it --network host deburau/galene:latest -turn $(curl -4 ifconfig.co):1194
+docker run -it --network host -e GALENE_TURN=$(curl -4 ifconfig.co):1194 deburau/galene:latest
 ```
 
 You can replace $(curl -4 ifconfig.co) with your server's ip address.
+
+Docker-compose:
+
+```yaml
+version: '3'
+
+services:
+  galene:
+    image: deburau/galene:latest
+    container_name: galene
+    restart: always
+    network_mode: host
+    environment:
+      - GALENE_TURN=1.2.3.4:1194
+```
 
 ## Configure data and groups
 
@@ -43,7 +76,34 @@ To configure groups, passwords, ice servers etc. you can use volume mounts.
 
 ```bash
 mkdir data groups
-docker run -it -p 8443:8443 -v $PWD/data:/data -v $PWD/groups:/groups deburau/galene:latest -turn ""
+docker run -it \
+  -p 8443:8443 \
+  -e GALENE_TURN= \
+  -e GALENE_DATA=/data \
+  -e GALENE_GROUPS=/groups \
+  -v $PWD/data:/data \
+  -v $PWD/groups:/groups deburau/galene:latest
+```
+
+Docker-compose:
+
+```yaml
+version: '3'
+
+services:
+  galene:
+    image: deburau/galene:latest
+    container_name: galene
+    restart: always
+    volumes:
+      - ./data:/data
+      - ./groups:/groups
+    ports:
+      - 8443:8443
+    environment:
+      - GALENE_DATA=/data
+      - GALENE_GROUPS=/groups
+      - GALENE_TURN=
 ```
 
 ### Setting the admin password
@@ -85,6 +145,25 @@ cat > data/ice-servers.json <<EOF
 EOF
 ```
 
+## Environment variables
+
+| Environment Variable| Value     | Description
+| ---                 | ---       | ---
+| GALENE_CPUPROFILE   | file      | Store CPU profile in file               
+| GALENE_DATA         | directory | Data directory                          
+| GALENE_GROUPS       | directory | Group description directory             
+| GALENE_HTTP         | address   | Web server address (default ":8443")    
+| GALENE_INSECURE     | 1         | Act as an HTTP server rather than HTTPS 
+| GALENE_MDNS         | 1         | Gather mDNS addresses                   
+| GALENE_MEMPROFILE   | file      | Store memory profile in file            
+| GALENE_MUTEXPROFILE | file      | Store mutex profile in file
+| GALENE_RECORDINGS   | directory | Recordings directory
+| GALENE_REDIRECT     | host      | Redirect to canonical host
+| GALENE_RELAY_ONLY   | 1         | Require use of TURN relays for all media traffic
+| GALENE_STATIC       | directory | Web server root directory
+| GALENE_TURN         | address   | Built-in TURN server address ("" to disable) (default "auto")
+
+
 ## Complete docker-compose Example
 
 I am using it with my own turn server and traefik as reverse proxy.
@@ -100,29 +179,36 @@ services:
     volumes:
       - ./data:/data
       - ./groups:/groups
-    ports:
-      - 1194:1194/tcp
-      - 1194:1194/udp
+      - ./recordings:/recordings
+      - ./profiles:/profiles
     networks:
       traefik:
+    environment:
+      - GALENE_CPUPROFILE=/profiles/cpu.profile
+      - GALENE_DATA=/data
+      - GALENE_GROUPS=/groups
+      - GALENE_HTTP=:80
+      - GALENE_INSECURE=1
+      - GALENE_MDNS
+      - GALENE_MEMPROFILE/profiles/mem.profile
+      - GALENE_MUTEXPROFILE/profiles/mutex.profile
+      - GALENE_RECORDINGS=/recordings
+      - GALENE_REDIRECT
+      - GALENE_RELAY_ONLY
+      - GALENE_STATIC
+      - GALENE_TURN=
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.galene.rule=Host(`galene.example.com`)"
       - "traefik.http.routers.galene.entrypoints=websecure"
       - "traefik.http.routers.galene.tls=true"
-      - "traefik.http.routers.galene.tls.domains[0].main=galene.galene.example.com"
+      - "traefik.http.routers.galene.tls.domains[0].main=galene.example.com"
       - "traefik.http.routers.galene.service=galene"
       - "traefik.http.services.galene.loadbalancer.server.port=80"
       - "traefik.http.services.galene.loadbalancer.server.scheme=http"
       - "traefik.http.services.galene.loadbalancer.passhostheader=true"
-    command:
-      - -http
-      - :80
-      - -insecure
-      - -turn
-      - ""
-
+      
 networks:
   traefik:
     external: true
