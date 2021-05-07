@@ -150,23 +150,32 @@ cat > data/ice-servers.json <<EOF
 EOF
 ```
 
+To let the container wait the turn server to start, you can use [docker-compose-wait](https://github.com/ufoscout/docker-compose-wait). docker-compose-wait is configured through environment variables, you can read about them on the docker-compose-wait [page](https://github.com/ufoscout/docker-compose-wait).
+
 ## Environment variables
 
-| Environment Variable| Value     | Description
-| ---                 | ---       | ---
-| GALENE_CPUPROFILE   | file      | Store CPU profile in file               
-| GALENE_DATA         | directory | Data directory                          
-| GALENE_GROUPS       | directory | Group description directory             
-| GALENE_HTTP         | address   | Web server address (default ":8443")    
-| GALENE_INSECURE     | 1         | Act as an HTTP server rather than HTTPS 
-| GALENE_MDNS         | 1         | Gather mDNS addresses                   
-| GALENE_MEMPROFILE   | file      | Store memory profile in file            
-| GALENE_MUTEXPROFILE | file      | Store mutex profile in file
-| GALENE_RECORDINGS   | directory | Recordings directory
-| GALENE_REDIRECT     | host      | Redirect to canonical host
-| GALENE_RELAY_ONLY   | 1         | Require use of TURN relays for all media traffic
-| GALENE_STATIC       | directory | Web server root directory
-| GALENE_TURN         | address   | Built-in TURN server address ("" to disable) (default "auto")
+| Environment Variable      | Value     | Description
+| ---                       | ---       | ---
+| GALENE_CPUPROFILE         | file      | Store CPU profile in file               
+| GALENE_DATA               | directory | Data directory                          
+| GALENE_GROUPS             | directory | Group description directory             
+| GALENE_HTTP               | address   | Web server address (default ":8443")    
+| GALENE_INSECURE           | 1         | Act as an HTTP server rather than HTTPS 
+| GALENE_MDNS               | 1         | Gather mDNS addresses                   
+| GALENE_MEMPROFILE         | file      | Store memory profile in file            
+| GALENE_MUTEXPROFILE       | file      | Store mutex profile in file
+| GALENE_RECORDINGS         | directory | Recordings directory
+| GALENE_REDIRECT           | host      | Redirect to canonical host
+| GALENE_RELAY_ONLY         | 1         | Require use of TURN relays for all media traffic
+| GALENE_STATIC             | directory | Web server root directory
+| GALENE_TURN               | address   | Built-in TURN server address ("" to disable) (default "auto")
+| WAIT_LOGGER_LEVEL         | loglevel  | The output logger level. Valid values are: debug, info, error, off. the default is debug.
+| WAIT_HOSTS                |           | Comma separated list of pairs host:port for which you want to wait.
+| WAIT_HOSTS_TIMEOUT        | number    | Max number of seconds to wait for all the hosts to be available before failure. The default is 30 seconds.
+| WAIT_HOST_CONNECT_TIMEOUT | number    | The timeout of a single TCP connection to a remote host before attempting a new connection. The default is 5 seconds.
+| WAIT_BEFORE_HOSTS         | number    | Number of seconds to wait (sleep) before start checking for the hosts availability
+| WAIT_AFTER_HOSTS          | number    | Number of seconds to wait (sleep) once all the hosts are available
+| WAIT_SLEEP_INTERVAL       | number    | Number of seconds to sleep between retries. The default is 1 second.
 
 
 ## Complete docker-compose Example
@@ -189,6 +198,11 @@ services:
     networks:
       traefik:
     environment:
+      - WAIT_HOSTS=turn.example.com:5349
+      - WAIT_LOGGER_LEVEL=info
+      - WAIT_HOSTS_TIMEOUT=60
+      - WAIT_AFTER_HOSTS=1
+      - WAIT_SLEEP_INTERVAL=5
       - GALENE_CPUPROFILE=/profiles/cpu.profile
       - GALENE_DATA=/data
       - GALENE_GROUPS=/groups

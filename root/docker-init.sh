@@ -13,5 +13,12 @@ echo "  - Galène directory: ${GALENE_PATH}"
 
 # Execute all scripts in /docker-init.d/
 for file in /docker-init.d/*; do
-  [ -f "${file}" ] && source "${file}" "$@"
+  if [ -x "${file}" ]; then
+    "${file}" "$@"
+  elif [ -f "${file}" ]; then
+    source "${file}" "$@"
+  else
+    echo "!!! cannot execute ${file}"
+    exit 1
+  fi
 done

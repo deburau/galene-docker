@@ -1,5 +1,6 @@
 ARG DIR=/go/src/galene
 ARG VERSION=0.3.4
+ARG WAIT_VERSION=2.8.0
 
 FROM golang:alpine AS builder
 ARG DIR
@@ -15,6 +16,8 @@ ARG DIR
 ARG VERSION
 ARG VCS_REF=$SOURCE_COMMIT
 ARG TARGET_DIR=/opt/galene
+ARG WAIT_VERSION
+ARG WAIT_BIN=/docker-init.d/01-docker-compose-wait
 
 RUN mkdir -p ${TARGET_DIR}/groups/
 
@@ -38,6 +41,9 @@ COPY --from=builder ${DIR}/galene ${TARGET_DIR}/
 COPY --from=builder ${DIR}/static/ ${TARGET_DIR}/static/
 
 COPY root/ /
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/${WAIT_VERSION}/wait ${WAIT_BIN}
+RUN chmod 0755 ${WAIT_BIN}
 
 WORKDIR ${TARGET_DIR}
 ENTRYPOINT ["/docker-init.sh"]
