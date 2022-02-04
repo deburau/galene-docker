@@ -1,6 +1,6 @@
 ARG DIR=/go/src/galene
-ARG VERSION=0.4.1
-ARG WAIT_VERSION=2.8.0
+ARG VERSION=0.4.4
+ARG WAIT_VERSION=2.9.0
 
 FROM golang:alpine AS builder
 ARG DIR
