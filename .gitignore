@@ -3,4 +3,4 @@
 /profiles/
 /recordings/
 docker-compose.yml
-build.txt
+build.txt*
