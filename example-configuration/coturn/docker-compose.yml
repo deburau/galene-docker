@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  coturn:
+    image: coturn/coturn:4.5-alpine
+    container_name: coturn
+    restart: always
+    volumes:
+      - PATH_TO_CERTIFICATES:/etc/acme.sh/example.com:ro
+      - ./turnserver.conf:/etc/coturn/turnserver.conf
+      - ./dhp.pem:/etc/turnserver/dhp.pem
+    network_mode: host
+    labels:
+      - "traefik.enable=false"
