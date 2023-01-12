@@ -1,0 +1,11 @@
+[
+    {
+        "Urls": [
+            "turn:1.2.3.4:5349?transport=tcp",
+            "turn:1.2.3.4:5349?transport=udp"
+        ],
+	"username": "galene",
+        "credential": "mysecretcredential",
+        "credentialType": "hmac-sha1"
+    }
+]

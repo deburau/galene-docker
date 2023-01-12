@@ -1,0 +1,4 @@
+{
+  "canonicalHost": "galene.example.com",
+  "admin":[{"username":"admin","password":"mysecretpassword"}]
+}
