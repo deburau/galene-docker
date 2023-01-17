@@ -72,7 +72,7 @@ services:
     restart: always
     network_mode: host
     environment:
-      - GALENE_TURN=1.2.3.4:1194
+      - GALENE_TURN=:1194
 ```
 
 ## Configure data and groups
@@ -180,7 +180,27 @@ To let the container wait the turn server to start, you can use [docker-compose-
 
 ## Complete docker-compose Example
 
-I am using it with my own turn server and traefik as reverse proxy.
+I am using it with the builtin turn server and traefik as reverse proxy.
+
+For this to work, you have to make a change in your trafik configuration, if traefik is running as a docker container. Add the following lines to your docker-compose.yml
+
+```yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+```
+
+You have to use a newer docker version, I am currently using 20.10.22.
+
+Then create `config.json` in your config directory, e.g. `data/config.json` (replace proxyURL)
+
+```json
+{
+    "proxyURL": "https://galene.example.com/",
+    "admin":[{"username":"admin","password":"secretpassword"}]
+}
+```
+
+After that, create the `docker-compose.yml` (again, replace the domain name)
 
 ```yaml
 version: '3'
@@ -195,27 +215,15 @@ services:
       - ./groups:/groups
       - ./recordings:/recordings
       - ./profiles:/profiles
-    networks:
-      traefik:
+    network_mode: host
     environment:
-      - WAIT_HOSTS=turn.example.com:5349
-      - WAIT_LOGGER_LEVEL=info
-      - WAIT_HOSTS_TIMEOUT=60
-      - WAIT_AFTER_HOSTS=1
-      - WAIT_SLEEP_INTERVAL=5
-      - GALENE_CPUPROFILE=/profiles/cpu.profile
       - GALENE_DATA=/data
       - GALENE_GROUPS=/groups
-      - GALENE_HTTP=:80
+      - GALENE_HTTP=:4080
       - GALENE_INSECURE=1
-      - GALENE_MDNS
-      - GALENE_MEMPROFILE/profiles/mem.profile
-      - GALENE_MUTEXPROFILE/profiles/mutex.profile
       - GALENE_RECORDINGS=/recordings
       - GALENE_REDIRECT
-      - GALENE_RELAY_ONLY
-      - GALENE_STATIC
-      - GALENE_TURN=
+      - GALENE_TURN=:1194
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
@@ -224,13 +232,21 @@ services:
       - "traefik.http.routers.galene.tls=true"
       - "traefik.http.routers.galene.tls.domains[0].main=galene.example.com"
       - "traefik.http.routers.galene.service=galene"
-      - "traefik.http.services.galene.loadbalancer.server.port=80"
+      - "traefik.http.services.galene.loadbalancer.server.port=4080"
       - "traefik.http.services.galene.loadbalancer.server.scheme=http"
       - "traefik.http.services.galene.loadbalancer.passhostheader=true"
-      
-networks:
-  traefik:
-    external: true
 ```
 
-More examples and complete docs can be found in the [garage44 wiki](https://github.com/garage44/galene/wiki) an the official [site](https://github.com/garage44/galene/wiki).
+Be sure to block access to the port 4080 (or any port you choose) from the internet. This port must be reachable from the traefik container. For me, running on Ubuntu, I used the command
+
+```sh
+sudo ufw allow proto tcp from 172.16.0.0/12 to any port 4080
+```
+
+Also the turn port (1194 for me) should be reachable from the internet
+
+```sh
+sudo ufw allow port 1194
+```
+
+Eventually all outgoing traffic should be allowed. If not, adjust your firewall accordingly.
