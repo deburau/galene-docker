@@ -222,7 +222,6 @@ services:
       - GALENE_HTTP=:4080
       - GALENE_INSECURE=1
       - GALENE_RECORDINGS=/recordings
-      - GALENE_REDIRECT
       - GALENE_TURN=:1194
     labels:
       - "traefik.enable=true"
